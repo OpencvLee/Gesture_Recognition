@@ -1,0 +1,31 @@
+version: '{build}'
+
+branches:
+  only:
+  - master
+
+clone_folder: c:\dev\gesture_recognition
+
+install:
+  - cinst 7zip.commandline
+  - ps:  $dwntool=New-Object System.Net.WebClient
+  - ps:  $dwntool.DownloadFile('https://github.com/zeruniverse/Gesture_Recognition/releases/download/V1.0/opencv.zip','c:\dev\opencv.zip')
+  - cmd: 7z x c:\dev\opencv.zip -oc:\opencv -y > nul
+
+build:
+build_script:
+  - xcopy  c:\dev\gesture_recognition c:\dev\bld /s /e /y /i
+  - cd c:\dev\bld
+  - msbuild /m /p:Configuration=Release /p:Platform="Win32" Gesture_Recognition.sln
+
+on_success:
+  - cd c:\dev\bld\Release
+  - dir
+  
+notifications:
+  - provider: Email
+    to:
+      - zzy8200@gmail.com
+    on_build_success: false
+    on_build_failure: false
+    on_build_status_changed: true
